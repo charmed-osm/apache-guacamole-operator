@@ -1,0 +1,32 @@
+# Copyright 2021 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+name: davigar15-apache-guacamole
+display-name: Apache Guacamole
+description: |
+  Apache Guacamole is a clientless remote desktop gateway.
+  It supports standard protocols like VNC, RDP, and SSH.
+  We call it clientless because no plugins or client software are required.
+  Thanks to HTML5, once Guacamole is installed on a server,
+  all you need to access your desktops is a web browser.
+
+summary: |
+  clientless remote desktop gateway
+
+containers:
+  guacamole:
+    resource: guacamole-image
+
+resources:
+  guacamole-image:
+    type: oci-image
+    description: OCI image for Apache Guacamole
+    upstream-source: guacamole/guacamole:1.3.0
+
+requires:
+  guacd:
+    interface: guacd
+    limit: 1
+  mysql:
+    interface: mysql
+    limit: 1

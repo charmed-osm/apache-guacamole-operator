@@ -24,7 +24,6 @@ async def test_build_and_deploy(ops_test: OpsTest):
     await ops_test.model.set_config({"update-status-hook-interval": "10s"})
     await ops_test.model.deploy("charmed-osm-mariadb-k8s", application_name="mariadb-k8s")
     await ops_test.model.deploy("davigar15-apache-guacd", application_name="guacd", channel="edge")
-    await ops_test.model.wait_for_idle(timeout=1000)
     # build and deploy charm from local source folder
     charm = await ops_test.build_charm(".")
     resources = {

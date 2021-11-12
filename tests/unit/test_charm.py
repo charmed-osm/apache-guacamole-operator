@@ -1,15 +1,26 @@
 # Copyright 2021 Canonical Ltd.
 # See LICENSE file for licensing details.
 
+from ipaddress import IPv4Address
+
 import pytest
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus
 from ops.testing import Harness
 from pytest_mock import MockerFixture
 
-from charm import ApacheGuacamoleCharm
+from charm import ApacheGuacamoleCharm, pod_ip
 
 pebble_exec_mock = None
 mysql_rel_id = None
+
+
+def test_pod_ip(mocker: MockerFixture):
+    socket_mock = mocker.patch("charm.socket")
+    socket_mock.getfqdn.return_value = "host"
+    socket_mock.gethostbyname.return_value = "1.1.1.1"
+    assert pod_ip() == IPv4Address("1.1.1.1")
+    assert socket_mock.getfqdn.call_count == 1
+    socket_mock.gethostbyname.assert_called_once_with("host")
 
 
 @pytest.fixture
@@ -67,6 +78,16 @@ def test_missing_units_in_relation(harness: Harness):
     harness.remove_relation_unit(mysql_rel_id, "mysql/0")
     harness.charm.on.guacamole_pebble_ready.emit("guacamole")
     assert harness.charm.unit.status == BlockedStatus("missing relations: mysql")
+
+
+def test_guacamole_pebble_ready_leader(mocker: MockerFixture, harness: Harness):
+    harness.set_leader(True)
+    pod_ip_mock = mocker.patch("charm.pod_ip")
+    pod_ip_mock.return_value = "IP"
+    spy = mocker.spy(harness.charm, "_restart")
+    harness.charm.on.guacamole_pebble_ready.emit("guacamole")
+    assert harness.charm.unit.status == ActiveStatus("Go to http://IP:8080/guacamole")
+    assert spy.call_count == 1
 
 
 def test_guacamole_pebble_ready(mocker: MockerFixture, harness: Harness):

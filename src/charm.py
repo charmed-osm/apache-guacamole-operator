@@ -5,6 +5,9 @@
 """Guacamole charm module."""
 
 import logging
+import socket
+from ipaddress import IPv4Address
+from typing import Optional
 
 from charms.davigar15_apache_guacd.v0.guacd import GuacdEvents, GuacdRequires
 from ops.charm import CharmBase, ConfigChangedEvent, WorkloadEvent
@@ -15,6 +18,12 @@ from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus
 from mysql import Mysql, MysqlRequires
 
 logger = logging.getLogger(__name__)
+
+
+def pod_ip() -> Optional[IPv4Address]:
+    """Pod's IP address."""
+    fqdn = socket.getfqdn()
+    return IPv4Address(socket.gethostbyname(fqdn))
 
 
 class ApacheGuacamoleCharm(CharmBase):
@@ -81,7 +90,10 @@ class ApacheGuacamoleCharm(CharmBase):
         layer = self._get_pebble_layer()
         self._set_pebble_layer(layer)
         self._restart_service()
-        self.unit.status = ActiveStatus()
+        if self.unit.is_leader():
+            self.unit.status = ActiveStatus(f"Go to http://{pod_ip()}:8080/guacamole")
+        else:
+            self.unit.status = ActiveStatus()
 
     def _restart_service(self):
         container = self.container

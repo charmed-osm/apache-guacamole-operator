@@ -89,6 +89,7 @@ class Mysql:
     def execute(self, sql: str):
         """Execute sql script."""
         queries = self._load_queries(sql)
+        exception = None
         if queries:
             with self._connection:
                 with self._connection.cursor() as cursor:
@@ -97,10 +98,13 @@ class Mysql:
                             cursor.execute(query)
                         except Exception as e:
                             if "Query was empty" not in str(e) and "already exists" not in str(e):
-                                logger.error(f"SQL syntax error in :{query}")
-                                raise e
+                                exception = e
+                                break
                         queries.remove(query)
                 self._connection.commit()
+        if exception:
+            logger.error(f"SQL syntax error in :{query}")
+            raise exception
 
     def _load_queries(self, sql: str):
         sql_without_comments = ""

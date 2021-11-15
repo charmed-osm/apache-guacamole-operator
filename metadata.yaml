@@ -30,3 +30,6 @@ requires:
   mysql:
     interface: mysql
     limit: 1
+  ingress:
+    interface: ingress
+    limit: 1

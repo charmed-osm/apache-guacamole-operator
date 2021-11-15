@@ -10,6 +10,8 @@ from ipaddress import IPv4Address
 from typing import Optional
 
 from charms.davigar15_apache_guacd.v0.guacd import GuacdEvents, GuacdRequires
+from charms.nginx_ingress_integrator.v0.ingress import IngressRequires
+from charms.observability_libs.v0.kubernetes_service_patch import KubernetesServicePatch
 from ops.charm import CharmBase, ConfigChangedEvent, WorkloadEvent
 from ops.framework import StoredState
 from ops.main import main
@@ -34,7 +36,18 @@ class ApacheGuacamoleCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self._port = 8080
         self.guacd = GuacdRequires(self, self._stored)
+        self.mysql = MysqlRequires(self)
+        KubernetesServicePatch(self, [(f"{self.app.name}", self._port)])
+        self.ingress = IngressRequires(
+            self,
+            {
+                "service-hostname": self._external_hostname,
+                "service-name": self.app.name,
+                "service-port": self._port,
+            },
+        )
         event_observe_mapping = {
             self.on.guacamole_pebble_ready: self._on_guacamole_pebble_ready,
             self.on.config_changed: self._on_config_changed,
@@ -44,7 +57,6 @@ class ApacheGuacamoleCharm(CharmBase):
         for event, observer in event_observe_mapping.items():
             self.framework.observe(event, observer)
         self._stored.set_default(db_initialized=False)
-        self.mysql = MysqlRequires(self)
 
     @property
     def container(self):
@@ -62,6 +74,7 @@ class ApacheGuacamoleCharm(CharmBase):
     def _on_config_changed(self, event: ConfigChangedEvent):
         if self.container.can_connect():
             self._restart()
+            self.ingress.update_config({"service-hostname": self._external_hostname})
         else:
             logger.info("pebble socket not available, deferring config-changed")
             event.defer()
@@ -91,7 +104,12 @@ class ApacheGuacamoleCharm(CharmBase):
         self._set_pebble_layer(layer)
         self._restart_service()
         if self.unit.is_leader():
-            self.unit.status = ActiveStatus(f"Go to http://{pod_ip()}:8080/guacamole")
+            hostname = (
+                self.config["external-hostname"]
+                if self.model.get_relation("ingress") and self.config.get("external-hostname")
+                else f"{pod_ip()}:{self._port}"
+            )
+            self.unit.status = ActiveStatus(f"Go to http://{hostname}/guacamole")
         else:
             self.unit.status = ActiveStatus()
 
@@ -139,6 +157,15 @@ class ApacheGuacamoleCharm(CharmBase):
         )
         sql, _ = process.wait_output()
         return sql
+
+    @property
+    def _external_hostname(self) -> str:
+        """Return the external hostname to be passed to ingress via the relation."""
+        # It is recommended to default to `self.app.name` so that the external
+        # hostname will correspond to the deployed application name in the
+        # model, but allow it to be set to something specific via config.
+
+        return self.config.get("external-hostname") or f"{self.app.name}"
 
 
 if __name__ == "__main__":  # pragma: no cover

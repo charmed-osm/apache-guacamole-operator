@@ -1,4 +1,7 @@
 # Copyright 2021 David Garcia
 # See LICENSE file for licensing details.
 
-options: {}
+options:
+  external-hostname:
+    description: External hostname for the ingress
+    type: string

@@ -7,6 +7,8 @@ See LICENSE file for licensing details. -->
 [![code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black/tree/main)
 [![Run-Tests](https://github.com/davigar15/charm-apache-guacd/actions/workflows/ci.yaml/badge.svg)](https://github.com/davigar15/charm-apache-guacd/actions/workflows/ci.yaml)
 
+[![Apache Guacamole](https://charmhub.io/davigar15-apache-guacamole/badge.svg)](https://charmhub.io/davigar15-apache-guacamole)
+
 ## Description
 
 Apache Guacamole is a clientless remote desktop gateway. It supports standard protocols like VNC, RDP, and SSH.

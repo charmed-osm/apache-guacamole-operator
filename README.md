@@ -24,17 +24,37 @@ juju add-model apache-guacamole
 juju deploy charmed-osm-mariadb-k8s db
 juju deploy davigar15-apache-guacd --channel edge guacd
 # Deploy Apache Guacamole Operator
-juju deploy davigar15-apache-guacamole --channel edge guacamole
+juju deploy davigar15-apache-guacamole --channel edge guacamole --trust
 # Add relations
 juju relate guacamole db
 juju relate guacamole guacd
 ```
-
-# Accessing the UI
+## Accessing the UI
 
 Execute the command `watch -c juju status --color` to check the status of the deployment. When the deployment is done, the `guacamole` charm will show a status log to the URL you need to go to access guacamole.
 
 Default credentials are `guacadmin`/`guacadmin`.
+
+### Exposing the UI through ingress
+
+Exposing the Apache Guacamole charm though ingress is really simple thanks to the [`nginx-ingress-integrator`](https://charmhub.io/nginx-ingress-integrator) charm, which takes care of the communication with K8s to create the right Ingress Resource.
+
+First, let's deploy ingress and relate it with guacamole:
+
+```shell
+juju deploy nginx-ingress-integrator --trust ingress
+juju relate guacamole ingress
+```
+
+The Apache Guacamole charm has an `external-hostname` configuration option that must be set in order to expose the service through ingress. The hostname must resolved to an IP that points to the kubernetes worker(s) where the guacamole application lives. The simplest way of achiving that without any DNS setup is by using a Wildcard DNS like [`nip.io`](https://nip.io/). 
+
+```shell
+juju config guacamole external-hostname=guacamole.127.0.0.1.nip.io
+```
+
+Replace `127.0.0.1` in the external hostname with the external IP of the Kubernetes worker in order to expose the service to the outside world.
+
+Now check the `juju status guacamole` output again, and find the new URL to access the UI through ingress.
 
 
 ## OCI Images

@@ -25,6 +25,7 @@ def test_pod_ip(mocker: MockerFixture):
 
 @pytest.fixture
 def harness_no_relations(mocker: MockerFixture):
+    mocker.patch("charm.KubernetesServicePatch")
     process_mock = mocker.Mock()
     process_mock.wait_output.return_value = ("sql", None)
     global pebble_exec_mock

@@ -55,6 +55,6 @@ juju add-model test-guacamole
 # Enable DEBUG logging
 juju model-config logging-config="<root>=INFO;unit=DEBUG"
 # Deploy the charm
-juju deploy ./davigar15-apache-guacamole_ubuntu-20.04-amd64.charm \
+juju deploy ./apache-guacamole_ubuntu-20.04-amd64.charm \
   --resource guacamole-image=guacamole/guacamole:1.3.0
 ```

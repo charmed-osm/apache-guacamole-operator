@@ -7,7 +7,7 @@ See LICENSE file for licensing details. -->
 [![code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black/tree/main)
 [![Run-Tests](https://github.com/davigar15/charm-apache-guacd/actions/workflows/ci.yaml/badge.svg)](https://github.com/davigar15/charm-apache-guacd/actions/workflows/ci.yaml)
 
-[![Apache Guacamole](https://charmhub.io/davigar15-apache-guacamole/badge.svg)](https://charmhub.io/davigar15-apache-guacamole)
+[![Apache Guacamole](https://charmhub.io/apache-guacamole/badge.svg)](https://charmhub.io/apache-guacamole)
 
 ## Description
 
@@ -17,16 +17,16 @@ Thanks to HTML5, once Guacamole is installed on a server, all you need to access
 
 ## Usage
 
-The Apache Guacamole Operator needs relations [`mysql`](https://charmhub.io/charmed-osm-mariadb-k8s) and [`guacd`](https://charmhub.io/davigar15-apache-guacd). All the charms may be deployed using the Juju command line as in
+The Apache Guacamole Operator needs relations [`mysql`](https://charmhub.io/charmed-osm-mariadb-k8s) and [`guacd`](https://charmhub.io/apache-guacd). All the charms may be deployed using the Juju command line as in
 
 ```shell
 # Create a Juju Model
 juju add-model apache-guacamole
 # Deploy database and guacd
 juju deploy charmed-osm-mariadb-k8s db
-juju deploy davigar15-apache-guacd --channel edge guacd
+juju deploy apache-guacd guacd
 # Deploy Apache Guacamole Operator
-juju deploy davigar15-apache-guacamole --channel edge guacamole --trust
+juju deploy apache-guacamole guacamole --trust
 # Add relations
 juju relate guacamole db
 juju relate guacamole guacd

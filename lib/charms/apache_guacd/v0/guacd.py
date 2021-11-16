@@ -41,6 +41,7 @@ class SomeApplication(CharmBase):
 ```
 """
 
+
 import socket
 from ipaddress import IPv4Address
 from typing import Optional
@@ -49,14 +50,14 @@ from ops.charm import CharmEvents, RelationEvent
 from ops.framework import EventBase, EventSource, Object
 
 # The unique Charmhub library identifier, never change it
-LIBID = "a985821f0485468cbc230da017dc7b7c"
+LIBID = "49a97420b5ce4b45b493d48ec74867b8"
 
 # Increment this major API version when introducing breaking changes
 LIBAPI = 0
 
 # Increment this PATCH version before using `charmcraft publish-lib` or reset
 # to 0 if you are raising the major API version
-LIBPATCH = 2
+LIBPATCH = 1
 
 
 def pod_ip() -> Optional[IPv4Address]:

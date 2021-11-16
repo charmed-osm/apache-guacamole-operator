@@ -9,7 +9,7 @@ import socket
 from ipaddress import IPv4Address
 from typing import Optional
 
-from charms.davigar15_apache_guacd.v0.guacd import GuacdEvents, GuacdRequires
+from charms.apache_guacd.v0.guacd import GuacdEvents, GuacdRequires
 from charms.nginx_ingress_integrator.v0.ingress import IngressRequires
 from charms.observability_libs.v0.kubernetes_service_patch import KubernetesServicePatch
 from ops.charm import CharmBase, ConfigChangedEvent, WorkloadEvent

@@ -25,7 +25,7 @@ async def test_build_and_deploy(ops_test: OpsTest):
     """
     await ops_test.model.set_config({"update-status-hook-interval": "10s"})
     await ops_test.model.deploy("charmed-osm-mariadb-k8s", application_name="mariadb-k8s")
-    await ops_test.model.deploy("davigar15-apache-guacd", application_name="guacd", channel="edge")
+    await ops_test.model.deploy("apache-guacd", application_name="guacd")
     await ops_test.model.deploy("nginx-ingress-integrator", application_name="ingress", trust=True)
     # build and deploy charm from local source folder
     subprocess.run(["/usr/bin/sg", "microk8s", "-c", "microk8s.enable ingress"])

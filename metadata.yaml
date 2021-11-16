@@ -1,7 +1,7 @@
 # Copyright 2021 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-name: davigar15-apache-guacamole
+name: apache-guacamole
 display-name: Apache Guacamole
 description: |
   Apache Guacamole is a clientless remote desktop gateway.
